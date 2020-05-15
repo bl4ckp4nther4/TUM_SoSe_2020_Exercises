@@ -1,0 +1,8 @@
+(context) Need to implement Monte Carlo Integration in python
+
+(issue) Doing this in c++ is probably more time intensive,
+        Python is more readable and can plot functions, which is very hard with C++
+        The other alternative is doing it in matlab, also possible, probably a bit faster,
+        but matlab is super heavy on this machine
+
+(why do i care) i need the practise for the computational physics 2 exam
