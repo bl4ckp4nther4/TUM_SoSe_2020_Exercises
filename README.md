@@ -1,2 +1,7 @@
-# Computational-Physics
-# Exercises for the lecture Computational Physics 2 at TUM in the Summer Semester 2020
+# Exercise Calculations
+Scripts and Programs to calculate values and plot graphs for the exercises of the lectures:
+
+- Computational Physics 2
+- Laser Technology
+- (Biomedical Physics 2)
+- (Renewable Energy)
