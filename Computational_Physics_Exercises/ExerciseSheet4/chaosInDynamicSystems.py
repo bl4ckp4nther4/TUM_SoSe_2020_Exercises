@@ -89,6 +89,16 @@ class timeEvolutionFrictionAndForce(timeEvolutionFrictionPendulum):
         timeEvolutionFrictionPendulum.__init__(self, alpha, )
 
 
+class timeEvolutionSinForce(timeEvolutionFrictionAndForce):
+    def diffEq(self, t, Y):
+        # system of linked differential equations
+        F = np.zeros(2)
+        F[0] = Y[1]
+        F[1] = -(self.omega0**2 + self.f * np.cos(self.omega * t)) * \
+            np.sin(Y[0]) - self.alpha * Y[1]
+        return F
+
+
 class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
     noOfSequences = 100
     omega0 = 1
@@ -148,19 +158,16 @@ class phaseSpaceFrictionAndForce(phaseSpaceFrictionPendulum):
         phaseSpaceFrictionPendulum.__init__(self, alpha, noOfSequences)
 
 
-class phaseSpaceSinForce(phaseSpaceFrictionAndForce):
-    def diffEq(self, t, Y):
-        # system of linked differential equations
-        F = np.zeros(2)
-        F[0] = Y[1]
-        F[1] = -(self.omega0**2 + self.f * np.cos(self.omega * t)) * \
-            np.sin(Y[0]) - self.alpha * Y[1]
-        return F
+class phaseSpaceSinForce(timeEvolutionSinForce, phaseSpaceFrictionAndForce):
+    # combine the two classes
+    def __init__(self, alpha, f, omega, noOfSequences):
+        phaseSpaceFrictionAndForce.__init__(
+            self, alpha, f, omega, noOfSequences)
 
 
 class bifurcationPlotSinForce(phaseSpaceSinForce):
-
-    # =============================================================================
+    tMax = 10
+# =============================================================================
 
 
 def exercise2a1():
