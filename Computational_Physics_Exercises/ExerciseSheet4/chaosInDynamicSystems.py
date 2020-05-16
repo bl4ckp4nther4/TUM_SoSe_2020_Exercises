@@ -15,11 +15,6 @@ class freePendulumDiffEq():
 
     def __init__(self, omega0):
         self.omega0 = omega0
-        self.alpha = 0
-        self.f = 0
-        self.Y = np.zeros(2)  # vector Y
-        self.Y[0] = 0.1  # initial position
-        self.Y[1] = 0   # initial speed
 
     def diffEq(self, t, Y):
         # system of linked differential equations
@@ -32,17 +27,10 @@ class freePendulumDiffEq():
 
 class timeEvolutionFreePendulum(freePendulumDiffEq):
     tMax = 10
-    h = freePendulumDiffEq.h
-    timeEvolution = np.zeros((int(tMax/h), 2))
+    timeEvolution = np.zeros((100, 2))
 
     def __init__(self, omega0, tMax):
         self.omega0 = omega0
-        self.alpha = 0
-        self.f = 0
-        self.Y = np.zeros(2)  # vector Y
-        self.Y[0] = 0.1  # initial position
-        self.Y[1] = 0   # initial speed
-
         self.tMax = tMax
 
         self.setTimeEvolution()
@@ -67,6 +55,8 @@ class timeEvolutionFreePendulum(freePendulumDiffEq):
             self.timeEvolution[i, 0] = t
             self.timeEvolution[i, 1] = Y[0]
 
+
+# =============================================================================
 
 exercise1a1 = timeEvolutionFreePendulum(1, 10)
 plt.plot(exercise1a1.timeEvolution[:, 0], exercise1a1.timeEvolution[:, 1])
