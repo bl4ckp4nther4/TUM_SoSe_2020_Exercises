@@ -67,7 +67,7 @@ class timeEvolutionFreePendulum(freePendulumDiffEq):
             self.positionSeq[i] = Y[0]
             self.speedSeq[i] = Y[1]
 
-    def plot(self):
+    def timePlot(self):
         plt.plot(self.timeSeq, self.positionSeq)
         plt.xlabel("time in sec")
         plt.ylabel("position")
@@ -114,7 +114,7 @@ class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
             self.positionSequences[:, i] = self.positionSeq
             self.speedSequences[:, i] = self.speedSeq
 
-    def plot(self):
+    def phasePlot(self):
         plt.scatter(self.positionSequences, self.speedSequences, s=0.5)
         plt.show()
 
@@ -128,34 +128,53 @@ class phaseSpaceFrictionPendulum(phaseSpaceFreePendulum):
                                         omega0, tMax, xMax, yMax, noOfSequences)
 
 
+class phaseSpaceFrictionAndForce(phaseSpaceFrictionPendulum):
+    alpha = 0.1
+    f = 1
+    omega = 2
+
+    def __init__(self, omega0, alpha, f, omega, tMax, xMax, yMax, noOfSequences):
+        self.alpha = alpha
+        self.f = f
+        self.omega = omega
+        phaseSpaceFreePendulum.__init__(self,
+                                        omega0, tMax, xMax, yMax, noOfSequences)
+
+
 # =============================================================================
 
-def exercies1a1():
+
+def exercise2a1():
     freePendulumSmallDisplacement = timeEvolutionFreePendulum(1, 10, 0.1, 0)
-    freePendulumSmallDisplacement.plot()
+    freePendulumSmallDisplacement.timePlot()
 
 
-def exercise1a2():
+def exercise2a2():
     freePendulumLargeDisplacement = timeEvolutionFreePendulum(1, 10, 0.1, 0)
-    freePendulumLargeDisplacement.plot()
+    freePendulumLargeDisplacement.timePlot()
 
 
-def exercise1a3():
+def exercise2a3():
     freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 10, 1, 0, 1)
-    freePendulumPhaseSpace.plot()
+    freePendulumPhaseSpace.phasePlot()
 
 
-def exercise1b():
+def exercise2b():
     freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 10, 5, 5, 100)
-    freePendulumPhaseSpace.plot()
+    freePendulumPhaseSpace.phasePlot()
 
 
-def exercise1c():
+def exercise2c():
     withFriction = phaseSpaceFrictionPendulum(1, 0.1, 10, 5, 5, 100)
-    withFriction.plot()
+    withFriction.timePlot()
+    withFriction.phasePlot()
+
+
+def exercise2d():
+    frictionForce = phaseSpaceFrictionAndForce(1, 0.1, 0.2, 0.6, 10, 5, 5, 100)
+    frictionForce.plot()
 
 
 # ==============================================================================
 
-
-exercise1c()
+exercise2c()
