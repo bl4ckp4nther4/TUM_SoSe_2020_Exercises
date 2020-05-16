@@ -136,7 +136,7 @@ class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
             self.speedSequences[:, i] = self.speedSeq
 
     def phasePlot(self):
-        plt.scatter(self.positionSequences, self.speedSequences, s=0.5)
+        plt.scatter(self.positionSequences, self.speedSequences, s=0.05)
         plt.show()
 
 
@@ -174,12 +174,12 @@ def exercise2a2():
 
 
 def exercise2a3():
-    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 10, 1, 0, 1)
+    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 100, 1, 0, 1)
     freePendulumPhaseSpace.phasePlot()
 
 
 def exercise2b():
-    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 10, 5, 5, 100)
+    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 100, 5, 5, 100)
     freePendulumPhaseSpace.phasePlot()
 
 
@@ -189,7 +189,7 @@ def exercise2c1():
 
 
 def exercise2c2():
-    withFriction = phaseSpaceFrictionPendulum(1, 0.1, 10, 5, 5, 100)
+    withFriction = phaseSpaceFrictionPendulum(1, 0.1, 100, 5, 5, 100)
     withFriction.phasePlot()
 
 
@@ -198,6 +198,24 @@ def exercise2d1():
     frictionForce.timePlot()
 
 
+def exercise2d2():
+    frictionForce = phaseSpaceFrictionAndForce(
+        1, 0.1, 0.2, 0.6, 100, 5, 5, 100)
+    frictionForce.phasePlot()
+
+
+def exercise2d3():
+    frictionForce = timeEvolutionFrictionAndForce(1, 0.1, 0.8, 0.6, 100, 1, 0)
+    frictionForce.timePlot()
+
+
+def exercise2d4():
+    frictionForce = phaseSpaceFrictionAndForce(
+        1, 0.1, 0.6, 0.6, 100, 5, 5, 100)
+    frictionForce.phasePlot()
+
+
 # ==============================================================================
 
-exercise2d1()
+
+exercise2d4()
