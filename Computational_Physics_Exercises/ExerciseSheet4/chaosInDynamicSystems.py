@@ -33,12 +33,7 @@ class timeEvolutionFreePendulum(diffEqFreePendulum):
     positionSeq = np.zeros(100)
     speedSeq = np.zeros(100)
 
-    def __init__(self, omega0, tMax, initPos, initSpeed):
-        self.omega0 = omega0
-        self.tMax = tMax
-        self.Y_0[0] = initPos
-        self.Y_0[1] = initSpeed
-
+    def __init__(self):
         self.setTimeEvolution(self.Y_0[0], self.Y_0[1])
 
     def RK4(self, t, Y):
@@ -77,26 +72,25 @@ class timeEvolutionFreePendulum(diffEqFreePendulum):
 class timeEvolutionFrictionPendulum(timeEvolutionFreePendulum):
     alpha = 0.1
 
-    def __init__(self, omega0, alpha, tMax, initPos, initSpeed):
+    def __init__(self, alpha):
         self.alpha = alpha
 
-        timeEvolutionFreePendulum.__init__(
-            self, omega0, tMax, initPos, initSpeed)
+        timeEvolutionFreePendulum.__init__(self)
 
 
 class timeEvolutionFrictionAndForce(timeEvolutionFrictionPendulum):
     f = 1
     omega = 2
 
-    def __init__(self, omega0, alpha, f, omega, tMax, initPos, initSpeed):
+    def __init__(self, alpha, f, omega):
         self.f = f
         self.omega = omega
-        timeEvolutionFrictionPendulum.__init__(
-            self, omega0, alpha, tMax, initPos, initSpeed)
+        timeEvolutionFrictionPendulum.__init__(self, alpha, )
 
 
 class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
     noOfSequences = 100
+    omega0 = 1
     h = 0.01
     tMax = 100
     xMax = 5
@@ -105,12 +99,7 @@ class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
     positionSequences = np.zeros((100, 100))
     speedSequences = np.zeros((100, 100))
 
-    def __init__(self, omega0, tMax, xMax, yMax, noOfSequences):
-        self.omega0 = omega0
-        self.tMax = tMax
-        self.xMax = xMax
-        self.yMax = yMax
-
+    def __init__(self, noOfSequences):
         self.noOfSequences = noOfSequences
 
         self.setPhaseSpace(self.noOfSequences)
@@ -143,79 +132,99 @@ class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
 class phaseSpaceFrictionPendulum(phaseSpaceFreePendulum):
     alpha = 0.1
 
-    def __init__(self, omega0, alpha, tMax, xMax, yMax, noOfSequences):
+    def __init__(self, alpha, noOfSequences):
         self.alpha = alpha
-        phaseSpaceFreePendulum.__init__(self,
-                                        omega0, tMax, xMax, yMax, noOfSequences)
+        phaseSpaceFreePendulum.__init__(self, noOfSequences)
 
 
 class phaseSpaceFrictionAndForce(phaseSpaceFrictionPendulum):
     f = 1
     omega = 2
 
-    def __init__(self, omega0, alpha, f, omega, tMax, xMax, yMax, noOfSequences):
+    def __init__(self, alpha, f, omega, noOfSequences):
         self.f = f
         self.omega = omega
-        phaseSpaceFrictionPendulum.__init__(self,
-                                            omega0, alpha, tMax, xMax, yMax, noOfSequences)
+        phaseSpaceFrictionPendulum.__init__(self, alpha, noOfSequences)
 
 
 # =============================================================================
 
 
 def exercise2a1():
-    freePendulumSmallDisplacement = timeEvolutionFreePendulum(1, 10, 0.1, 0)
+    initPos = 0.1
+    initSpeed = 0
+    freePendulumSmallDisplacement = timeEvolutionFreePendulum()
+    freePendulumSmallDisplacement.setTimeEvolution(initPos, initSpeed)
     freePendulumSmallDisplacement.timePlot()
 
 
 def exercise2a2():
-    freePendulumLargeDisplacement = timeEvolutionFreePendulum(1, 10, 0.1, 0)
+    initPos = 1
+    initSpeed = 0
+    freePendulumLargeDisplacement = timeEvolutionFreePendulum()
+    freePendulumLargeDisplacement.setTimeEvolution(initPos, initSpeed)
     freePendulumLargeDisplacement.timePlot()
 
 
 def exercise2a3():
-    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 100, 1, 0, 1)
-    freePendulumPhaseSpace.phasePlot()
+    oneFreePendulum = phaseSpaceFreePendulum(1)
+    oneFreePendulum.phasePlot()
 
 
 def exercise2b():
-    freePendulumPhaseSpace = phaseSpaceFreePendulum(1, 100, 5, 5, 100)
+    noOfSequences = 100
+    freePendulumPhaseSpace = phaseSpaceFreePendulum(noOfSequences)
     freePendulumPhaseSpace.phasePlot()
 
 
 def exercise2c1():
-    withFriction = timeEvolutionFrictionPendulum(1, 0.1, 100, 1, 0)
+    alpha = 0.1
+    withFriction = timeEvolutionFrictionPendulum(alpha)
     withFriction.timePlot()
 
 
 def exercise2c2():
-    withFriction = phaseSpaceFrictionPendulum(1, 0.1, 100, 5, 5, 100)
+    alpha = 1
+    noOfSequences = 100
+    withFriction = phaseSpaceFrictionPendulum(alpha, noOfSequences)
     withFriction.phasePlot()
 
 
 def exercise2d1():
-    frictionForce = timeEvolutionFrictionAndForce(1, 0.1, 0.2, 0.6, 100, 1, 0)
+    alpha = 0.1
+    f = 0.2
+    omega = 0.6
+    frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
     frictionForce.timePlot()
 
 
 def exercise2d2():
-    frictionForce = phaseSpaceFrictionAndForce(
-        1, 0.1, 0.2, 0.6, 100, 5, 5, 100)
+    alpha = 0.1
+    f = 0.2
+    omega = 0.6
+    noOfSequences = 100
+    frictionForce = phaseSpaceFrictionAndForce(alpha, f, omega, noOfSequences)
     frictionForce.phasePlot()
 
 
 def exercise2d3():
-    frictionForce = timeEvolutionFrictionAndForce(1, 0.1, 0.8, 0.6, 100, 1, 0)
+    alpha = 0.1
+    f = 0.8
+    omega = 0.6
+    frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
     frictionForce.timePlot()
 
 
 def exercise2d4():
-    frictionForce = phaseSpaceFrictionAndForce(
-        1, 0.1, 0.6, 0.6, 100, 5, 5, 100)
+    alpha = 0.1
+    f = 0.8
+    omega = 0.6
+    noOfSequences = 100
+    frictionForce = phaseSpaceFrictionAndForce(alpha, f, omega, noOfSequences)
     frictionForce.phasePlot()
 
 
 # ==============================================================================
 
 
-exercise2d4()
+exercise2c1()
