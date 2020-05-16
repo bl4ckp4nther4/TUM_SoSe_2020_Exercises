@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import random as rand
 
 
-class freePendulumDiffEq():
+class diffEqFreePendulum():
     alpha = 0   # friction
     f = 0       # driving force
     omega = 0   # frequency of the driving force
@@ -27,7 +27,7 @@ class freePendulumDiffEq():
         return F
 
 
-class timeEvolutionFreePendulum(freePendulumDiffEq):
+class timeEvolutionFreePendulum(diffEqFreePendulum):
     tMax = 10
     timeSeq = np.zeros(100)
     positionSeq = np.zeros(100)
@@ -72,6 +72,16 @@ class timeEvolutionFreePendulum(freePendulumDiffEq):
         plt.xlabel("time in sec")
         plt.ylabel("position")
         plt.show()
+
+
+class timeEvolutionFrictionPendulum(timeEvolutionFreePendulum):
+    alpha = 0.1
+
+    def __init__(self, omega0, alpha, tMax, initPos, initSpeed):
+        self.alpha = alpha
+
+        timeEvolutionFreePendulum.__init__(
+            self, omega0, tMax, initPos, initSpeed)
 
 
 class phaseSpaceFreePendulum(timeEvolutionFreePendulum):
@@ -164,17 +174,21 @@ def exercise2b():
     freePendulumPhaseSpace.phasePlot()
 
 
-def exercise2c():
-    withFriction = phaseSpaceFrictionPendulum(1, 0.1, 10, 5, 5, 100)
+def exercise2c1():
+    withFriction = timeEvolutionFrictionPendulum(1, 0.1, 100, 1, 0)
     withFriction.timePlot()
+
+
+def exercise2c2():
+    withFriction = phaseSpaceFrictionPendulum(1, 0.1, 10, 5, 5, 100)
     withFriction.phasePlot()
 
 
 def exercise2d():
     frictionForce = phaseSpaceFrictionAndForce(1, 0.1, 0.2, 0.6, 10, 5, 5, 100)
-    frictionForce.plot()
+    frictionForce.phasePlot()
 
 
 # ==============================================================================
 
-exercise2c()
+exercise2c1()
