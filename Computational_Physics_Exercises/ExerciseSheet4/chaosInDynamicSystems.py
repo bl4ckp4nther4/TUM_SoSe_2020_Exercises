@@ -159,14 +159,17 @@ class diffEqPendulum():
         plt.show()
 
 
-# class diffEqSinForce(diffEqPendulum):
-#     def diffEq(self, t, Y):
-#          # system of linked differential equations
-#          F = np.zeros(2)
-#          F[0] = Y[1]
-#          F[1] = -(self.omega0**2 + self.f * np.cos(self.omega * t)) * \
-#              np.sin(Y[0]) - self.alpha * Y[1]
-#          return F
+class diffEqSinForce(diffEqPendulum):
+    def __diffEq(self, t, Y):
+        # system of linked differential equations
+
+        F = np.zeros(2)
+
+        F[0] = Y[1]
+        F[1] = -(self.__omega0**2 + self.__f * np.cos(self.__omega * t)) * \
+            np.sin(Y[0]) - self.__alpha * Y[1]
+
+        return F
 
 
 # class timeEvolutionSinForce(timeEvolutionPendulum):
@@ -295,9 +298,10 @@ class exercises():
         frictionForce.setTimings(100, 0.01)
         frictionForce.phasePlotSeqs(noOfSequences)
 
-    # def e2e1(self):
-    #     sinForce = phaseSpaceSinForce(0.1, 0.2, 2, 100)
-    #     sinForce.phasePlot()
+    def e2e1(self):
+        sinForce = diffEqSinForce(1, 0.1, 0.2, 2)
+        sinForce.setTimings(200, 0.1)
+        sinForce.timePlot(0.1, 0)
 
     # def e2e2(self):
     #     biPlot = bifurcationPlotSinForce()
@@ -307,4 +311,4 @@ class exercises():
 
 exercise = exercises()
 
-exercise.e2d4()
+exercise.e2e1()
