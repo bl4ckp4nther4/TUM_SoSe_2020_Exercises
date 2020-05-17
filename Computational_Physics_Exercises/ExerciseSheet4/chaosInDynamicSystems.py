@@ -166,89 +166,121 @@ class phaseSpaceSinForce(timeEvolutionSinForce, phaseSpaceFrictionAndForce):
 
 
 class bifurcationPlotSinForce(phaseSpaceSinForce):
-    tMax = 10
+    f = rand.random()*2
+    plotPoints = []
+
+    def __init__(self):
+
+        self.setBifurcationPlot()
+
+    def setBifurcationPlot(self):
+        for i in range(1, 5000):
+            Y = np.zeros(2)
+            Y[0] = 1
+            Y[1] = 0
+            self.f = rand.random()*2
+
+            for j in range(int(self.tMax/self.h)):
+                t = i*self.h
+                Y = self.RK4(t, Y, self.h)
+
+            oldPos = Y[0]
+
+            while Y[0] / oldPos > 0:
+                t = t + self.h/10
+                Y = self.RK4(t, Y, self.h/10)
+                np.append(self.plotPoints, (self.f, Y))
+
+    def RK4(self, t, Y, h):
+        # Runge Kutta Methode
+        k1 = h * self.diffEq(t, Y)
+        k2 = h * self.diffEq(t + h/2, Y + k1/2)
+        k3 = h * self.diffEq(t + h/2, Y + k2/2)
+        k4 = h * self.diffEq(t + h, Y + k3)
+        return Y + k1/6 + k2/3 + k3/3 + k4/6
+
+
 # =============================================================================
 
+class exercises():
 
-def exercise2a1():
-    initPos = 0.1
-    initSpeed = 0
-    freePendulumSmallDisplacement = timeEvolutionFreePendulum()
-    freePendulumSmallDisplacement.setTimeEvolution(initPos, initSpeed)
-    freePendulumSmallDisplacement.timePlot()
+    def __init__(self):
+        print("exercise:")
 
+    def e2a1():
+        initPos = 0.1
+        initSpeed = 0
+        freePendulumSmallDisplacement = timeEvolutionFreePendulum()
+        freePendulumSmallDisplacement.setTimeEvolution(initPos, initSpeed)
+        freePendulumSmallDisplacement.timePlot()
 
-def exercise2a2():
-    initPos = 1
-    initSpeed = 0
-    freePendulumLargeDisplacement = timeEvolutionFreePendulum()
-    freePendulumLargeDisplacement.setTimeEvolution(initPos, initSpeed)
-    freePendulumLargeDisplacement.timePlot()
+    def e2a2():
+        initPos = 1
+        initSpeed = 0
+        freePendulumLargeDisplacement = timeEvolutionFreePendulum()
+        freePendulumLargeDisplacement.setTimeEvolution(initPos, initSpeed)
+        freePendulumLargeDisplacement.timePlot()
 
+    def e2a3():
+        oneFreePendulum = phaseSpaceFreePendulum(1)
+        oneFreePendulum.phasePlot()
 
-def exercise2a3():
-    oneFreePendulum = phaseSpaceFreePendulum(1)
-    oneFreePendulum.phasePlot()
+    def e2b():
+        noOfSequences = 100
+        freePendulumPhaseSpace = phaseSpaceFreePendulum(noOfSequences)
+        freePendulumPhaseSpace.phasePlot()
 
+    def e2c1():
+        alpha = 0.1
+        withFriction = timeEvolutionFrictionPendulum(alpha)
+        withFriction.timePlot()
 
-def exercise2b():
-    noOfSequences = 100
-    freePendulumPhaseSpace = phaseSpaceFreePendulum(noOfSequences)
-    freePendulumPhaseSpace.phasePlot()
+    def e2c2():
+        alpha = 0.1
+        noOfSequences = 100
+        withFriction = phaseSpaceFrictionPendulum(alpha, noOfSequences)
+        withFriction.phasePlot()
 
+    def e2d1():
+        alpha = 0.1
+        f = 0.2
+        omega = 0.6
+        frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
+        frictionForce.timePlot()
 
-def exercise2c1():
-    alpha = 0.1
-    withFriction = timeEvolutionFrictionPendulum(alpha)
-    withFriction.timePlot()
+    def e2d2():
+        alpha = 0.1
+        f = 0.2
+        omega = 0.6
+        noOfSequences = 100
+        frictionForce = phaseSpaceFrictionAndForce(
+            alpha, f, omega, noOfSequences)
+        frictionForce.phasePlot()
 
+    def e2d3():
+        alpha = 0.1
+        f = 0.8
+        omega = 0.6
+        frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
+        frictionForce.timePlot()
 
-def exercise2c2():
-    alpha = 0.1
-    noOfSequences = 100
-    withFriction = phaseSpaceFrictionPendulum(alpha, noOfSequences)
-    withFriction.phasePlot()
+    def e2d4():
+        alpha = 0.1
+        f = 0.8
+        omega = 0.6
+        noOfSequences = 100
+        frictionForce = phaseSpaceFrictionAndForce(
+            alpha, f, omega, noOfSequences)
+        frictionForce.phasePlot()
 
+    def e2e1():
+        sinForce = phaseSpaceSinForce(0.1, 0.2, 2, 100)
+        sinForce.phasePlot()
 
-def exercise2d1():
-    alpha = 0.1
-    f = 0.2
-    omega = 0.6
-    frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
-    frictionForce.timePlot()
-
-
-def exercise2d2():
-    alpha = 0.1
-    f = 0.2
-    omega = 0.6
-    noOfSequences = 100
-    frictionForce = phaseSpaceFrictionAndForce(alpha, f, omega, noOfSequences)
-    frictionForce.phasePlot()
-
-
-def exercise2d3():
-    alpha = 0.1
-    f = 0.8
-    omega = 0.6
-    frictionForce = timeEvolutionFrictionAndForce(alpha, f, omega)
-    frictionForce.timePlot()
-
-
-def exercise2d4():
-    alpha = 0.1
-    f = 0.8
-    omega = 0.6
-    noOfSequences = 100
-    frictionForce = phaseSpaceFrictionAndForce(alpha, f, omega, noOfSequences)
-    frictionForce.phasePlot()
-
-
-def exercise2e1():
-    sinForce = phaseSpaceSinForce(0.1, 0.2, 2, 100)
-    sinForce.phasePlot()
+    def e2e2():
+        biPlot = bifurcationPlotSinForce()
 
 # ==============================================================================
 
 
-exercise2e1()
+exercises.e2a2()
