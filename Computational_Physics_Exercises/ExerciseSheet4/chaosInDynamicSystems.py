@@ -4,111 +4,111 @@ import random as rand
 
 
 class diffEqPendulum():
-    __omega0 = 1  # angular frequency of the pendulum for small angles
-    __alpha = 0   # friction
-    __f = 0       # driving force
-    __omega = 0   # frequency of the driving force
+    _omega0 = 1  # angular frequency of the pendulum for small angles
+    _alpha = 0   # friction
+    _f = 0       # driving force
+    _omega = 0   # frequency of the driving force
 
-    __tMax = 10       # total time length
-    __tStep = 0.1     # length of one time step
+    _tMax = 10       # total time length
+    _tStep = 0.1     # length of one time step
 
-    __Y_0 = np.zeros(2)  # vector Y
-    __Y_0[0] = 0.1      # initial position
-    __Y_0[1] = 0        # initial speed
+    _Y_0 = np.zeros(2)  # vector Y
+    _Y_0[0] = 0.1      # initial position
+    _Y_0[1] = 0        # initial speed
 
     timeSeq = np.zeros(100)     # OUTPUT: time sequence
     posSeq = np.zeros(100)      # OUTPUT: position sequence
     speedSeq = np.zeros(100)    # OUTPUT: speed sequence
 
-    __noOfSeqs = 100    # number of sequences calculated
+    _noOfSeqs = 100    # number of sequences calculated
 
     timeSeqs = np.zeros((100, 100))     # OUTPUT: time sequences
     posSeqs = np.zeros((100, 100))      # OUTPUT: position sequences
     speedSeqs = np.zeros((100, 100))    # OUTPUT: speed sequences
 
-    __xMax = 5  # maximum absolute value of initial positions
-    __vMax = 5  # maximum absolute value of initial speeds
+    _xMax = 5  # maximum absolute value of initial positions
+    _vMax = 5  # maximum absolute value of initial speeds
 
     def __init__(self, omega0, alpha, f, omega):
         # constructing the differential equation
-        self.__omega0 = omega0
-        self.__alpha = alpha
-        self.__f = f
-        self.__omega = omega
+        self._omega0 = omega0
+        self._alpha = alpha
+        self._f = f
+        self._omega = omega
 
-    def __diffEq(self, t, Y):
+    def _diffEq(self, t, Y):
         # system of linked differential equations
 
         F = np.zeros(2)
 
         F[0] = Y[1]
-        F[1] = -self.__omega0**2 * \
-            np.sin(Y[0]) - self.__alpha*Y[1] + \
-            self.__f * np.cos(self.__omega * t)
+        F[1] = -self._omega0**2 * \
+            np.sin(Y[0]) - self._alpha*Y[1] + \
+            self._f * np.cos(self._omega * t)
 
         return F
 
-    def __RK4(self, t, Y, tStep):
+    def _RK4(self, t, Y, tStep):
         # Runge Kutta Method for calculating the next timestep
-        k1 = tStep * self.__diffEq(t, Y)
-        k2 = tStep * self.__diffEq(t + tStep/2, Y + k1/2)
-        k3 = tStep * self.__diffEq(t + tStep/2, Y + k2/2)
-        k4 = tStep * self.__diffEq(t + tStep, Y + k3)
+        k1 = tStep * self._diffEq(t, Y)
+        k2 = tStep * self._diffEq(t + tStep/2, Y + k1/2)
+        k3 = tStep * self._diffEq(t + tStep/2, Y + k2/2)
+        k4 = tStep * self._diffEq(t + tStep, Y + k3)
         return Y + k1/6 + k2/3 + k3/3 + k4/6
 
-    def __setSeq(self, initPos, initSpeed):
+    def _setSeq(self, initPos, initSpeed):
         # calculating the position and speed for each timestep.
 
         # set the initial position and speed
-        self.__Y_0[0] = initPos
-        self.__Y_0[1] = initSpeed
+        self._Y_0[0] = initPos
+        self._Y_0[1] = initSpeed
 
         # reset and initialize sequence
-        self.timeSeq = np.zeros(int(self.__tMax/self.__tStep))
-        self.posSeq = np.zeros(int(self.__tMax/self.__tStep))
-        self.speedSeq = np.zeros(int(self.__tMax/self.__tStep))
+        self.timeSeq = np.zeros(int(self._tMax/self._tStep))
+        self.posSeq = np.zeros(int(self._tMax/self._tStep))
+        self.speedSeq = np.zeros(int(self._tMax/self._tStep))
 
         # set first position and speed to initial position and speed
-        Y = self.__Y_0
-        for i in range(int(self.__tMax/self.__tStep)):
+        Y = self._Y_0
+        for i in range(int(self._tMax/self._tStep)):
             # time
-            t = i*self.__tStep
+            t = i*self._tStep
 
             # calculating the position and speed in the next timestep
-            Y = self.__RK4(t, Y, self.__tStep)
+            Y = self._RK4(t, Y, self._tStep)
 
             # save time, position and speed in arrays
             self.timeSeq[i] = t
             self.posSeq[i] = Y[0]
             self.speedSeq[i] = Y[1]
 
-    def __setNSeqs(self, noOfSeqs):
+    def _setNSeqs(self, noOfSeqs):
         # calculaing N sequences and saving position and speed data of all
 
         # set the number of sequences
-        self.__noOfSeqs = noOfSeqs
+        self._noOfSeqs = noOfSeqs
 
         # reset and initialize the sequences
         self.timeSeqs = np.zeros(
-            (int(self.__tMax/self.__tStep), self.__noOfSeqs))
+            (int(self._tMax/self._tStep), self._noOfSeqs))
         self.posSeqs = np.zeros(
-            (int(self.__tMax/self.__tStep), self.__noOfSeqs))
+            (int(self._tMax/self._tStep), self._noOfSeqs))
         self.speedSeqs = np.zeros(
-            (int(self.__tMax/self.__tStep), self.__noOfSeqs))
+            (int(self._tMax/self._tStep), self._noOfSeqs))
 
         # initial position and speed, and sequence will be overwritten; save data in old* variables
-        oldY_0 = self.__Y_0
+        oldY_0 = self._Y_0
         oldTimeSeq = self.timeSeq
         oldPosSeq = self.posSeq
         oldSpeedSeq = self.speedSeq
 
-        for i in range(0, self.__noOfSeqs):
+        for i in range(0, self._noOfSeqs):
             # set random initial position and speed
-            self.__Y_0[0] = rand.random() * 2*self.__xMax - self.__xMax
-            self.__Y_0[1] = rand.random() * 2*self.__vMax - self.__vMax
+            self._Y_0[0] = rand.random() * 2*self._xMax - self._xMax
+            self._Y_0[1] = rand.random() * 2*self._vMax - self._vMax
 
             # calculate sequence
-            self.__setSeq(self.__Y_0[0], self.__Y_0[1])
+            self._setSeq(self._Y_0[0], self._Y_0[1])
 
             # save sequence in 2D-Array
             self.timeSeqs[:, i] = self.timeSeq
@@ -116,19 +116,19 @@ class diffEqPendulum():
             self.speedSeqs[:, i] = self.speedSeq
 
         # reinstate the initial speed, position and whole sequence
-        self.__Y_0 = oldY_0
+        self._Y_0 = oldY_0
         self.timeSeq = oldTimeSeq
         self.posSeq = oldPosSeq
         self.speedSeq = oldSpeedSeq
 
     def setTimings(self, tMax, tStep):
         # manually set custom time parameters
-        self.__tMax = tMax
-        self.__tStep = tStep
+        self._tMax = tMax
+        self._tStep = tStep
 
     def timePlot(self, initPos, initSpeed):
         # calculate one sequence and plot the position over time
-        self.__setSeq(initPos, initSpeed)
+        self._setSeq(initPos, initSpeed)
 
         plt.plot(self.timeSeq, self.posSeq)
         plt.xlabel("time in sec")
@@ -137,7 +137,7 @@ class diffEqPendulum():
 
     def phasePlot(self, initPos, initSpeed):
         # calculate one sequence and plot the speed over the position
-        self.__setSeq(initPos, initSpeed)
+        self._setSeq(initPos, initSpeed)
 
         plt.plot(self.posSeq, self.speedSeq)
         plt.xlabel("position")
@@ -146,12 +146,12 @@ class diffEqPendulum():
 
     def setMaxPosSpeed(self, xMax, vMax):
         # set custom max position and speed values for the random initial values of the sequences
-        self.__xMax = xMax
-        self.__vMax = vMax
+        self._xMax = xMax
+        self._vMax = vMax
 
     def phasePlotSeqs(self, noOfSeqs):
         # calculate N sequences and plot the speed over the position
-        self.__setNSeqs(noOfSeqs)
+        self._setNSeqs(noOfSeqs)
 
         plt.scatter(self.posSeqs, self.speedSeqs, s=0.05)
         plt.xlabel("position")
@@ -160,64 +160,49 @@ class diffEqPendulum():
 
 
 class diffEqSinForce(diffEqPendulum):
-    def __diffEq(self, t, Y):
+    # OUTPUT: data for the bifurcation plot
+    bifurcationData = np.zeros((1, 3))
+
+    def _diffEq(self, t, Y):
         # system of linked differential equations
 
         F = np.zeros(2)
 
         F[0] = Y[1]
-        F[1] = -(self.__omega0**2 + self.__f * np.cos(self.__omega * t)) * \
-            np.sin(Y[0]) - self.__alpha * Y[1]
+        F[1] = -(self._omega0**2 + self._f * np.cos(self._omega * t)) * \
+            np.sin(Y[0]) - self._alpha * Y[1]
 
         return F
 
+    def setBifurcationData(self):
 
-# class timeEvolutionSinForce(timeEvolutionPendulum):
-#
+        for i in range(1, 100):  # till 5000
+            Y = np.zeros(2)
+            Y[0] = 1
+            Y[1] = 0
+            self._f = rand.random()*2
 
-# class phaseSpaceSinForce(timeEvolutionSinForce, phaseSpacePendulum):
-#     # combine the two classes
-#     def __init__(self, alpha, f, omega, noOfSequences):
-#         phaseSpacePendulum.__init__(
-#             self, alpha, f, omega, noOfSequences)
+            print(i)
 
+            for j in range(int(self._tMax/self._tStep)):
+                t = j*self._tStep
+                Y = self._RK4(t, Y, self._tStep)
 
-# class bifurcationPlotSinForce(phaseSpaceSinForce):
-#     f = rand.random()*2
-#     plotPoints = []
+            oldPos = Y[0]
+            while Y[0] / oldPos > 0:
+                oldPos = Y[0]
 
-#     def __init__(self):
+                t = t + self._tStep/10
+                Y = self._RK4(t, Y, self._tStep/10)
 
-#         self.setBifurcationPlot()
+            # print(self._f, Y[0], Y[1])
+            self.bifurcationData = np.append(
+                self.bifurcationData, [[self._f, Y[0], Y[1]]], axis=0)
 
-#     def setBifurcationPlot(self):
-#         for i in range(1, 5000):
-#             Y = np.zeros(2)
-#             Y[0] = 1
-#             Y[1] = 0
-#             self.f = rand.random()*2
-
-#             for j in range(int(self.tMax/self.h)):
-#                 t = i*self.h
-#                 Y = self.RK4(t, Y, self.h)
-
-#             oldPos = Y[0]
-
-#             while Y[0] / oldPos > 0:
-#                 t = t + self.h/10
-#                 Y = self.RK4(t, Y, self.h/10)
-#                 np.append(self.plotPoints, (self.f, Y))
-
-#     def RK4(self, t, Y, h):
-#         # Runge Kutta Methode
-#         k1 = h * self.diffEq(t, Y)
-#         k2 = h * self.diffEq(t + h/2, Y + k1/2)
-#         k3 = h * self.diffEq(t + h/2, Y + k2/2)
-#         k4 = h * self.diffEq(t + h, Y + k3)
-#         return Y + k1/6 + k2/3 + k3/3 + k4/6
-
-
+        plt.scatter(self.bifurcationData[:, 0], self.bifurcationData[:, 2])
+        plt.show()
 # =============================================================================
+
 
 class exercises():
     message = "exercise:"
@@ -303,12 +288,23 @@ class exercises():
         sinForce.setTimings(200, 0.1)
         sinForce.timePlot(0.1, 0)
 
-    # def e2e2(self):
-    #     biPlot = bifurcationPlotSinForce()
+    def e2e2(self):
+        sinForce = diffEqSinForce(1, 0.1, 0.2, 2)
+        sinForce.setTimings(200, 0.1)
+        sinForce.phasePlot(0.1, 0)
+
+    def e2e3(self):
+        sinForce = diffEqSinForce(1, 0.1, 0.2, 2)
+        sinForce.setTimings(200, 0.1)
+        sinForce.phasePlotSeqs(100)
+
+    def e2e4(self):
+        sinForce = diffEqSinForce(1, 0.1, 0.2, 2)
+        sinForce.setBifurcationData()
 
 # ==============================================================================
 
 
 exercise = exercises()
 
-exercise.e2e1()
+exercise.e2e4()
