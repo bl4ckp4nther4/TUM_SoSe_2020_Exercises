@@ -162,6 +162,9 @@ class diffEqPendulum():
 class diffEqSinForce(diffEqPendulum):
     # OUTPUT: data for the bifurcation plot
     bifurcationData = np.zeros((1, 3))
+    bifurcationDataTimeOut = np.zeros((1, 3))
+    trajectoryEnd = []
+    timeOut = False
 
     def _diffEq(self, t, Y):
         # system of linked differential equations
@@ -174,33 +177,98 @@ class diffEqSinForce(diffEqPendulum):
 
         return F
 
-    def setBifurcationData(self):
+    def plotBifurcationData(self, noOfSeqs):
 
-        for i in range(1, 100):  # till 5000
+        for i in range(1, noOfSeqs):  # till 5000
+            print(i)
             Y = np.zeros(2)
+
+            # initial conditions
             Y[0] = 1
             Y[1] = 0
+            # random magnitide of the driving force
             self._f = rand.random()*2
 
-            print(i)
-
+            # calculating the trajectory of the pendulum until tMax
             for j in range(int(self._tMax/self._tStep)):
                 t = j*self._tStep
                 Y = self._RK4(t, Y, self._tStep)
 
             oldPos = Y[0]
+            # calculating the trajectory until the position is at 0
             while Y[0] / oldPos > 0:
                 oldPos = Y[0]
 
+                # time steps 10 times smaller
                 t = t + self._tStep/10
-                Y = self._RK4(t, Y, self._tStep/10)
+                if t > 1.2*self._tMax:
+                    self.timeOut = True
+                    break
 
-            # print(self._f, Y[0], Y[1])
-            self.bifurcationData = np.append(
-                self.bifurcationData, [[self._f, Y[0], Y[1]]], axis=0)
+                Y = self._RK4(t, Y, self._tStep/10)
+                self.trajectoryEnd = np.append(self.trajectoryEnd, Y[0])
+
+            # set bifuricationData
+            if self.timeOut == True:
+                self.bifurcationDataTimeOut = np.append(
+                    self.bifurcationDataTimeOut, [[self._f, np.abs(Y[0]), np.abs(Y[1])]], axis=0)
+            else:
+                self.bifurcationData = np.append(
+                    self.bifurcationData, [[self._f, np.abs(Y[0]), np.abs(Y[1])]], axis=0)
 
         plt.scatter(self.bifurcationData[:, 0], self.bifurcationData[:, 2])
+        plt.scatter(
+            self.bifurcationDataTimeOut[:, 0], self.bifurcationDataTimeOut[:, 2])
         plt.show()
+
+    def _setNSeqsRandf(self, noOfSeqs):
+        # calculaing N sequences and saving position and speed data of all
+
+        self._Y_0[0] = 1
+        self._Y_0[1] = 0
+        # set the number of sequences
+        self._noOfSeqs = noOfSeqs
+
+        # reset and initialize the sequences
+        self.timeSeqs = np.zeros(
+            (int(self._tMax/self._tStep), self._noOfSeqs))
+        self.posSeqs = np.zeros(
+            (int(self._tMax/self._tStep), self._noOfSeqs))
+        self.speedSeqs = np.zeros(
+            (int(self._tMax/self._tStep), self._noOfSeqs))
+
+        # initial f and sequence will be overwritten; save data in old* variables
+        oldf = self._f
+        oldTimeSeq = self.timeSeq
+        oldPosSeq = self.posSeq
+        oldSpeedSeq = self.speedSeq
+
+        for i in range(0, self._noOfSeqs):
+            # set random initial position and speed
+            self._f = rand.random() * 2
+            # calculate sequence
+            self._setSeq(self._Y_0[0], self._Y_0[1])
+
+            # save sequence in 2D-Array
+            self.timeSeqs[:, i] = self.timeSeq
+            self.posSeqs[:, i] = self.posSeq
+            self.speedSeqs[:, i] = self.speedSeq
+
+        # reinstate the force and whole sequence
+        self._f = oldf
+        self.timeSeq = oldTimeSeq
+        self.posSeq = oldPosSeq
+        self.speedSeq = oldSpeedSeq
+
+    def phasePlotSeqsRandf(self, noOfSeqs):
+        # calculate N sequences and plot the speed over the position
+        self._setNSeqsRandf(noOfSeqs)
+
+        plt.scatter(self.posSeqs, self.speedSeqs, s=0.05)
+        plt.xlabel("position")
+        plt.ylabel("speed")
+        plt.show()
+
 # =============================================================================
 
 
@@ -300,7 +368,8 @@ class exercises():
 
     def e2e4(self):
         sinForce = diffEqSinForce(1, 0.1, 0.2, 2)
-        sinForce.setBifurcationData()
+        sinForce.setTimings(200, 0.1)
+        sinForce.plotBifurcationData(250)
 
 # ==============================================================================
 
