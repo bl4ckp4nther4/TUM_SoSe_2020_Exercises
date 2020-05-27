@@ -1,5 +1,3 @@
-import math
-import random
 import numpy as np
 from matplotlib import image as im
 from matplotlib import pyplot as plt
