@@ -41,5 +41,5 @@ class sierpinskiTriangle():
         plt.show()
 
 
-ST = sierpinskiTriangle(100000)
+ST = sierpinskiTriangle(100)
 ST.plotPoints()
