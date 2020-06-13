@@ -11,10 +11,13 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
     imagWaveFkt[:, 0] = imagInitialWave
 
     for n in range(0, int(np.ceil(T/delta_t)-1)):
-        t = n*delta_t
-        print(n)
         realWaveFkt[:,n+1] = realWaveFkt[:,n] + 2*(delta_t/delta_x**2 + potential*delta_t)*imagWaveFkt[:,n] - delta_t/delta_x**2 * (shiftPlus(imagWaveFkt[:,n]) + shiftMinus(imagWaveFkt[:,n]))
+        realWaveFkt[0,n+1] = 0
+        realWaveFkt[N,n+1] = 0
+        
         imagWaveFkt[:,n+1] = imagWaveFkt[:,n] - 2*(delta_t/delta_x**2 + potential*delta_t)*realWaveFkt[:,n+1] - delta_t/delta_x**2 * (shiftPlus(realWaveFkt[:,n+1]) + shiftMinus(realWaveFkt[:,n+1]))
+        imagWaveFkt[0,n+1] = 0
+        imagWaveFkt[N,n+1] = 0
 
     probDensity = realWaveFkt**2 + imagWaveFkt**2
     return probDensity
@@ -54,7 +57,7 @@ delta_x = (end - start)/N
 x = np.linspace(start, end ,N+1)
 
 delta_t = (delta_x/2)**2
-T = 0.1
+T = 1
 
 realInitialWave = np.exp(-1/2 *  (x - x_0)**2/(sigma_0)**2)*np.cos(k_0 * x)
 imagInitialWave = np.exp(-1/2 *  (x - x_0)**2/(sigma_0)**2)*np.sin(k_0 * x)
