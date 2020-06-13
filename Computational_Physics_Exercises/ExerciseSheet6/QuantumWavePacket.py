@@ -11,14 +11,14 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
     imagWaveFkt[:, 0] = imagInitialWave
 
     for n in range(0, int(np.ceil(T/delta_t)-1)):
-        realWaveFkt[:,n+1] = realWaveFkt[:,n] + 2*(delta_t/delta_x**2 + potential*delta_t)*imagWaveFkt[:,n] - delta_t/delta_x**2 * (shiftPlus(imagWaveFkt[:,n]) + shiftMinus(imagWaveFkt[:,n]))
         realWaveFkt[0,n+1] = 0
         realWaveFkt[N,n+1] = 0
-        
-        imagWaveFkt[:,n+1] = imagWaveFkt[:,n] - 2*(delta_t/delta_x**2 + potential*delta_t)*realWaveFkt[:,n+1] - delta_t/delta_x**2 * (shiftPlus(realWaveFkt[:,n+1]) + shiftMinus(realWaveFkt[:,n+1]))
         imagWaveFkt[0,n+1] = 0
         imagWaveFkt[N,n+1] = 0
-
+        for i in range(1, N-1):
+            realWaveFkt[i,n+1] = realWaveFkt[i,n] + 2*(delta_t/delta_x**2 + potential[i]*delta_t)*imagWaveFkt[i,n] - delta_t/delta_x**2 * (imagWaveFkt[i+1,n] + imagWaveFkt[i-1,n])
+            imagWaveFkt[i,n+1] = imagWaveFkt[i,n] - 2*(delta_t/delta_x**2 + potential[i]*delta_t)*realWaveFkt[i,n+1] - delta_t/delta_x**2 * (realWaveFkt[i+1,n+1] + realWaveFkt[i-1,n+1])
+        
     probDensity = realWaveFkt**2 + imagWaveFkt**2
     return probDensity
 
