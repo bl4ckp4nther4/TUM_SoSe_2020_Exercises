@@ -19,9 +19,9 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
         for i in range(1, N-1):
             realWaveFkt[i,n+1] = realWaveFkt[i,n] + (2*delta_t/delta_x**2 + potential[i]*delta_t)*imagWaveFkt[i,n] - delta_t/delta_x**2 * (imagWaveFkt[i+1,n] + imagWaveFkt[i-1,n])
             imagWaveFkt[i,n+1] = imagWaveFkt[i,n] - (2*delta_t/delta_x**2 + potential[i]*delta_t)*realWaveFkt[i,n+1] + delta_t/delta_x**2 * (realWaveFkt[i+1,n+1] + realWaveFkt[i-1,n+1])
+        
+        probDensity[:,n+1] = realWaveFkt[:,n+1]**2 + imagWaveFkt[:,n] * imagWaveFkt[:,n+1]
 
-
-    probDensity = realWaveFkt**2 + imagWaveFkt**2
     return probDensity
 
 
@@ -66,9 +66,6 @@ imagInitialWave = np.exp(-1/2 *  (x - x_0)**2/(sigma_0)**2)*np.sin(k_0 * x)
 
 
 noPotential = np.zeros(N+1)
-infiniteWalls = np.zeros(N+1)
-infiniteWalls[0] = 1e50
-infiniteWalls[N] = 1e50
 harmonicPotential = np.linspace(-10,10,N+1)**2
 stepPotential = np.zeros(N+1)
 stepPotential[int(N/2):N+1] = 1
