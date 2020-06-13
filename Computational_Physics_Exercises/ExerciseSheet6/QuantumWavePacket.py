@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
     realWaveFkt = np.zeros([N+1, int(T/delta_t + 1)])
     imagWaveFkt = np.zeros([N+1, int(T/delta_t + 1)])
+    probDensity = np.zeros([N+1, int(T/delta_t + 1)])
 
     realWaveFkt[:, 0] = realInitialWave
     imagWaveFkt[:, 0] = imagInitialWave
@@ -16,9 +17,10 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
         imagWaveFkt[0,n+1] = 0
         imagWaveFkt[N,n+1] = 0
         for i in range(1, N-1):
-            realWaveFkt[i,n+1] = realWaveFkt[i,n] + 2*(delta_t/delta_x**2 + potential[i]*delta_t)*imagWaveFkt[i,n] - delta_t/delta_x**2 * (imagWaveFkt[i+1,n] + imagWaveFkt[i-1,n])
-            imagWaveFkt[i,n+1] = imagWaveFkt[i,n] - 2*(delta_t/delta_x**2 + potential[i]*delta_t)*realWaveFkt[i,n+1] - delta_t/delta_x**2 * (realWaveFkt[i+1,n+1] + realWaveFkt[i-1,n+1])
-        
+            realWaveFkt[i,n+1] = realWaveFkt[i,n] + (2*delta_t/delta_x**2 + potential[i]*delta_t)*imagWaveFkt[i,n] - delta_t/delta_x**2 * (imagWaveFkt[i+1,n] + imagWaveFkt[i-1,n])
+            imagWaveFkt[i,n+1] = imagWaveFkt[i,n] - (2*delta_t/delta_x**2 + potential[i]*delta_t)*realWaveFkt[i,n+1] + delta_t/delta_x**2 * (realWaveFkt[i+1,n+1] + realWaveFkt[i-1,n+1])
+
+
     probDensity = realWaveFkt**2 + imagWaveFkt**2
     return probDensity
 
