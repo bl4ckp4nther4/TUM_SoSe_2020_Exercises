@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 
-def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
+def staggeredTimesteps(
+    realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T
+):
     # calculating the probability density of of all timesteps and points in space
 
     # initializing the 2D arrays for real part imag part and prob density
@@ -69,7 +71,7 @@ k_0 = 17 * np.pi  # k_0 = 0
 delta_x = 0.01
 
 delta_t = (delta_x / 2) ** 2  # timesteps
-T = delta_t * 500  # total time
+T = delta_t * 1000  # total time
 
 # initial wavepacket in real and imaginary form
 realInitialWave = np.exp(-1 / 2 * (x - x_0) ** 2 / (sigma_0) ** 2) * np.cos(k_0 * x)
@@ -85,7 +87,9 @@ stepPotential[int(N / 2)] = 1  # potential barrier at N/2
 potential = noPotential
 
 # calculating the probability density
-probDensity = SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T)
+probDensity = staggeredTimesteps(
+    realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T
+)
 
 
 # ==============================================================================================
