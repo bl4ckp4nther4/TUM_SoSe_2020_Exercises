@@ -4,21 +4,30 @@ import plotly.graph_objects as go
 
 
 def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
+    # calculating the probability density of of all timesteps and points in space
+
+    # initializing the 2D arrays for real part imag part and prob density
     realWaveFkt = np.zeros([N + 1, int(T / delta_t + 1)])
     imagWaveFkt = np.zeros([N + 1, int(T / delta_t + 1)])
     probDensity = np.zeros([N + 1, int(T / delta_t + 1)])
 
+    # setting the first timestep to the initial wave function
     realWaveFkt[:, 0] = realInitialWave
     imagWaveFkt[:, 0] = imagInitialWave
 
+    # going through all time steps
     for n in range(0, int(np.ceil(T / delta_t) - 1)):
+
         # setting the borders to 0
         realWaveFkt[0, n + 1] = 0
         realWaveFkt[N, n + 1] = 0
         imagWaveFkt[0, n + 1] = 0
         imagWaveFkt[N, n + 1] = 0
 
+        # goint through all positions
         for i in range(1, N - 1):
+
+            # setting the real part of the wavefunction according to the lecture
             realWaveFkt[i, n + 1] = (
                 realWaveFkt[i, n]
                 + (2 * delta_t / delta_x ** 2 + potential[i] * delta_t)
@@ -27,6 +36,7 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
                 / delta_x ** 2
                 * (imagWaveFkt[i + 1, n] + imagWaveFkt[i - 1, n])
             )
+            # setting the imaginary part of the wavefunction according to the lecture
             imagWaveFkt[i, n + 1] = (
                 imagWaveFkt[i, n]
                 - (2 * delta_t / delta_x ** 2 + potential[i] * delta_t)
@@ -36,6 +46,7 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
                 * (realWaveFkt[i + 1, n + 1] + realWaveFkt[i - 1, n + 1])
             )
 
+        # setting the probability density after calculating each time step
         probDensity[:, n + 1] = (
             realWaveFkt[:, n + 1] ** 2 + imagWaveFkt[:, n] * imagWaveFkt[:, n + 1]
         )
@@ -43,33 +54,35 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
     return probDensity
 
 
-sigma_0 = 0.5
+sigma_0 = 0.5  # width of wavepacket in space
 k_0 = 17 * np.pi  # k_0 = 0
 delta_x = 0.01
-x_0 = 2.5
+x_0 = 2.5  # starting
 
-start = 0
-end = 5
-N = 200
-delta_x = (end - start) / N
+start = 0  # left border of space
+end = 5  # right border of space
+N = 200  # number of sections in space (number of points = N+1)
+delta_x = (end - start) / N  # size of one section in space
 x = np.linspace(start, end, N + 1)
 
-delta_t = (delta_x / 2) ** 2
-T = 0.05
+delta_t = (delta_x / 2) ** 2  # timesteps
+T = delta_t * 100  # total time
 
+# initial wavepacket in real and imaginary form
 realInitialWave = np.exp(-1 / 2 * (x - x_0) ** 2 / (sigma_0) ** 2) * np.cos(k_0 * x)
 imagInitialWave = np.exp(-1 / 2 * (x - x_0) ** 2 / (sigma_0) ** 2) * np.sin(k_0 * x)
 
-
-noPotential = np.zeros(N + 1)
-harmonicPotential = np.linspace(-10, 10, N + 1) ** 2
+# different potentials
+noPotential = np.zeros(N + 1)  # potential is zero everywhere
+harmonicPotential = np.linspace(-10, 10, N + 1) ** 2  # harmonic potential (quadratic)
 stepPotential = np.zeros(N + 1)
-stepPotential[int(N / 2) : N + 1] = 1
+stepPotential[int(N / 2)] = 1  # potential barrier at N/2
 
+# setting the potential
 potential = noPotential
 
-waveFunction = SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T)
-probDensity = abs(waveFunction) ** 2
+# calculating the probability density
+probDensity = SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T)
 
 
 # ==============================================================================================
