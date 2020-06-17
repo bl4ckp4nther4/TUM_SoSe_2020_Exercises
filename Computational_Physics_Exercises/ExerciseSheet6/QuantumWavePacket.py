@@ -24,7 +24,7 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
         imagWaveFkt[0, n + 1] = 0
         imagWaveFkt[N, n + 1] = 0
 
-        # goint through all positions
+        # going through all positions for the real part
         for i in range(1, N - 1):
 
             # setting the real part of the wavefunction according to the lecture
@@ -36,6 +36,9 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
                 / delta_x ** 2
                 * (imagWaveFkt[i + 1, n] + imagWaveFkt[i - 1, n])
             )
+        # going trough all the positions for the imag part
+        for i in range(1, N - 1):
+
             # setting the imaginary part of the wavefunction according to the lecture
             imagWaveFkt[i, n + 1] = (
                 imagWaveFkt[i, n]
@@ -54,19 +57,19 @@ def SL(realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T):
     return probDensity
 
 
-sigma_0 = 0.5  # width of wavepacket in space
-k_0 = 17 * np.pi  # k_0 = 0
-delta_x = 0.01
-x_0 = 2.5  # starting
-
 start = 0  # left border of space
-end = 5  # right border of space
-N = 200  # number of sections in space (number of points = N+1)
+end = 10  # right border of space
+N = 100  # number of sections in space (number of points = N+1)
 delta_x = (end - start) / N  # size of one section in space
 x = np.linspace(start, end, N + 1)
 
+x_0 = (end - start) / 2  # starting point of the wavepacket
+sigma_0 = (end - start) / 10  # width of wavepacket in space
+k_0 = 17 * np.pi  # k_0 = 0
+delta_x = 0.01
+
 delta_t = (delta_x / 2) ** 2  # timesteps
-T = delta_t * 100  # total time
+T = delta_t * 500  # total time
 
 # initial wavepacket in real and imaginary form
 realInitialWave = np.exp(-1 / 2 * (x - x_0) ** 2 / (sigma_0) ** 2) * np.cos(k_0 * x)
