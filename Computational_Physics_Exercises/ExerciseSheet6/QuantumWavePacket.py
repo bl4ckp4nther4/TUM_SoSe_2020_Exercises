@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import plotly.graph_objects as go
 
 
@@ -65,8 +66,8 @@ N = 100  # number of sections in space (number of points = N+1)
 delta_x = (end - start) / N  # size of one section in space
 x = np.linspace(start, end, N + 1)
 
-x_0 = (end - start) / 2  # starting point of the wavepacket
-sigma_0 = (end - start) / 10  # width of wavepacket in space
+x_0 = (end - start) / 4  # starting point of the wavepacket
+sigma_0 = (end - start) / 50  # width of wavepacket in space
 k_0 = 17 * np.pi  # k_0 = 0
 delta_x = 0.01
 
@@ -79,18 +80,28 @@ imagInitialWave = np.exp(-1 / 2 * (x - x_0) ** 2 / (sigma_0) ** 2) * np.sin(k_0 
 
 # different potentials
 noPotential = np.zeros(N + 1)  # potential is zero everywhere
-harmonicPotential = np.linspace(-10, 10, N + 1) ** 2  # harmonic potential (quadratic)
+harmonicPotential = np.linspace(-200, 200, N + 1) ** 2  # harmonic potential (quadratic)
 stepPotential = np.zeros(N + 1)
-stepPotential[int(N / 2)] = 1  # potential barrier at N/2
+stepPotential[int(N / 2)] = 1e4  # potential barrier at N/2
 
 # setting the potential
-potential = noPotential
+potential = harmonicPotential
+
+plt.plot(potential)
+plt.show()
 
 # calculating the probability density
 probDensity = staggeredTimesteps(
     realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T
 )
 
+# set every tenth datapoint in tine to plot
+plotData = np.zeros([N + 1, int((np.ceil(T / delta_t) - 1) / 10 + 1)])
+for n in range(0, int(np.ceil(T / delta_t) - 1)):
+    if n % 10 == 0:
+        plotData[:, int(n / 10)] = probDensity[:, n]
+plt.plot(plotData)
+plt.show()
 
 # ==============================================================================================
 # figure with slider
@@ -100,14 +111,14 @@ probDensity = staggeredTimesteps(
 fig = go.Figure()
 
 # Add traces, one for each slider step
-for step in range(0, int(np.ceil(T / delta_t) - 1)):
+for step in range(0, plotData[0, :].size):
     fig.add_trace(
         go.Scatter(
             visible=False,
             line=dict(color="#00CED1", width=6),
             name="𝜈 = " + str(step),
             x=x,
-            y=probDensity[:, step],
+            y=plotData[:, step],
         )
     )
 
