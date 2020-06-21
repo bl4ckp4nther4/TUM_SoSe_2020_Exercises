@@ -48,7 +48,6 @@ class species:
         self.setWeakestSpecies()
 
     def setRealTime(self):
-        T = 0.010
         self.realTime = 1
 
 
