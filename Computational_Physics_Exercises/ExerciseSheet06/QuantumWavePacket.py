@@ -4,58 +4,48 @@ import matplotlib.cm as cm
 import plotly.graph_objects as go
 
 
-def staggeredTimesteps(
-    realInitialWave, imagInitialWave, potential, delta_x, N, delta_t, T
-):
+def staggeredTimesteps(realInitWF, imagInitWF, pot, d_x, N, d_t, T):
     # calculating the probability density of of all timesteps and points in space
 
     # initializing the 2D arrays for real part imag part and prob density
-    realWaveFkt = np.zeros([N + 1, int(T / delta_t + 1)])
-    imagWaveFkt = np.zeros([N + 1, int(T / delta_t + 1)])
-    probDensity = np.zeros([N + 1, int(T / delta_t + 1)])
+    realWF = np.zeros([N + 1, int(T / d_t + 1)])
+    imagWF = np.zeros([N + 1, int(T / d_t + 1)])
+    probDensity = np.zeros([N + 1, int(T / d_t + 1)])
 
     # setting the first timestep to the initial wave function
-    realWaveFkt[:, 0] = realInitialWave
-    imagWaveFkt[:, 0] = imagInitialWave
+    realWF[:, 0] = realInitWF
+    imagWF[:, 0] = imagInitWF
 
     # going through all time steps
-    for n in range(0, int(np.ceil(T / delta_t) - 1)):
+    for n in range(0, int(np.ceil(T / d_t) - 1)):
 
         # setting the borders to 0
-        realWaveFkt[0, n + 1] = 0
-        realWaveFkt[N, n + 1] = 0
-        imagWaveFkt[0, n + 1] = 0
-        imagWaveFkt[N, n + 1] = 0
+        realWF[0, n + 1] = 0
+        realWF[N, n + 1] = 0
+        imagWF[0, n + 1] = 0
+        imagWF[N, n + 1] = 0
 
         # going through all positions for the real part
         for i in range(1, N - 1):
 
             # setting the real part of the wavefunction according to the lecture
-            realWaveFkt[i, n + 1] = (
-                realWaveFkt[i, n]
-                + (2 * delta_t / delta_x ** 2 + potential[i] * delta_t)
-                * imagWaveFkt[i, n]
-                - delta_t
-                / delta_x ** 2
-                * (imagWaveFkt[i + 1, n] + imagWaveFkt[i - 1, n])
+            realWF[i, n + 1] = (
+                realWF[i, n]
+                + (2 * d_t / d_x ** 2 + pot[i] * d_t) * imagWF[i, n]
+                - d_t / d_x ** 2 * (imagWF[i + 1, n] + imagWF[i - 1, n])
             )
         # going trough all the positions for the imag part
         for i in range(1, N - 1):
 
             # setting the imaginary part of the wavefunction according to the lecture
-            imagWaveFkt[i, n + 1] = (
-                imagWaveFkt[i, n]
-                - (2 * delta_t / delta_x ** 2 + potential[i] * delta_t)
-                * realWaveFkt[i, n + 1]
-                + delta_t
-                / delta_x ** 2
-                * (realWaveFkt[i + 1, n + 1] + realWaveFkt[i - 1, n + 1])
+            imagWF[i, n + 1] = (
+                imagWF[i, n]
+                - (2 * d_t / d_x ** 2 + pot[i] * d_t) * realWF[i, n + 1]
+                + d_t / d_x ** 2 * (realWF[i + 1, n + 1] + realWF[i - 1, n + 1])
             )
 
         # setting the probability density after calculating each time step
-        probDensity[:, n + 1] = (
-            realWaveFkt[:, n + 1] ** 2 + imagWaveFkt[:, n] * imagWaveFkt[:, n + 1]
-        )
+        probDensity[:, n + 1] = realWF[:, n + 1] ** 2 + imagWF[:, n] * imagWF[:, n + 1]
 
     return probDensity
 
