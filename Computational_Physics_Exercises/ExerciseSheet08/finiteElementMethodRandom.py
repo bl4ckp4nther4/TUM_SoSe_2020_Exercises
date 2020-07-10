@@ -70,7 +70,9 @@ class gaussPointsClass:
 
 def randxVector(a, b, npts):
     randVector = np.empty(npts)
-    for i in range(0, npts):
+    randVector[0] = 0
+    randVector[npts - 1] = 1
+    for i in range(1, npts - 1):
         randVector[i] = random.uniform(a, b)
 
     randxVector = np.sort(randVector)
@@ -98,7 +100,7 @@ def alpha_numerical(a, b, N, U_a, U_b, xVector):
     # ================================================================
     # CALCULATE b:
     bVector = np.empty(N - 1)
-    npts = 100  # number of points for the guass integration
+    npts = 32  # number of points for the guass integration
     for i in range(1, N):
         # set up the integrand
         def integrand(x):
@@ -169,10 +171,10 @@ def U_numerical(x, a, b, N, U_a, U_b, xVector, alpha):
     def phi(i, x, xVector, h):
         if x >= xVector[i - 1] and x <= xVector[i]:
             return (x - xVector[i - 1]) / h[i - 1]
-        if x >= xVector[i] and x <= xVector[i + 1]:
-            return (xVector[i + 1] - x) / h[i]
         if x < xVector[i - 1] or x > xVector[i + 1]:
             return 0
+        if x >= xVector[i] and x <= xVector[i + 1]:
+            return (xVector[i + 1] - x) / h[i]
 
     # calculate U
     sum = 0
@@ -194,6 +196,7 @@ a = 0
 b = 1
 
 
+meanSquareError = np.empty(101)
 # number of elements
 for N in range(3, 101):
 
@@ -205,13 +208,8 @@ for N in range(3, 101):
     x = np.linspace(a, b, 101)
     alpha = alpha_numerical(a, b, N, U_a, U_b, xVector)
     for k in range(0, 101):
-        if k % 10 == 0:
-            print(k)
         numericalFullRange[k] = U_numerical(x[k], a, b, N, U_a, U_b, xVector, alpha)
         analyticalFullRange[k] = U_analytical(x[k])
-    plt.plot(numericalFullRange)
-    plt.plot(analyticalFullRange)
-    plt.show()
 
     # calculate accuracy of the numerical solution:
     meanSquareError[N] = sum((numericalFullRange - analyticalFullRange) ** 2)
@@ -219,5 +217,5 @@ for N in range(3, 101):
 
 
 plt.plot(meanSquareError)
-plt.show
+plt.show()
 
