@@ -91,7 +91,7 @@ def alpha_numerical(a, b, N, U_a, U_b):
     # ================================================================
     # CALCULATE b:
     bVector = np.empty(N - 1)
-    npts = 100  # number of points for the guass integration
+    npts = 32  # number of points for the guass integration
     for i in range(1, N):
         # set up the integrand
         def integrand(x):
@@ -207,5 +207,5 @@ for N in range(3, 101):
 
 
 plt.plot(meanSquareError)
-plt.show
+plt.show()
 
