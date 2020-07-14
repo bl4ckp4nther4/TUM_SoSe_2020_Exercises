@@ -28,7 +28,7 @@ int main()
     // exercise 1a) - 1b)
     kT = 0.1;
 
-    vector<int> exercise1e = metropolisAlgorith(N, 10 * N, J, kT, coldStart);
+    vecto r<int> exercise1e = metropolisAlgorith(N, 10 * N, J, kT, coldStart);
     configurationPlot(exercise1e);
 
     // exercise 1f)
