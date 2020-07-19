@@ -18,7 +18,8 @@ class progressBar:
             "\b" * (self.toolbarWidth + 1)
         )  # return to start of line, after '['
 
-    def updateBar(self, progress):
+    def updateBar(self, i, N):
+        progress = i / N
         progressBits = progress * self.toolbarWidth
 
         delta = int(np.floor(progressBits) - self.lastUpdate)
@@ -68,24 +69,22 @@ def configProbability(oldConfig, newConfig):
 def deltaAction(oldConfig, newConfig):
     oldAction = configAction(oldConfig)
     newAction = configAction(newConfig)
-    deltaAction = newAction - oldAction
+    deltaAction = oldAction - newAction
     return deltaAction
 
 
 def setConfig(N, coldStart):
     config = np.empty(N + 1)
 
-    config[0] = 0
-    config[N] = 0
-
     # initial setup ising chain
-    for i in range(1, N):  # set dipoles randomly to 1 or -1
+    for i in range(0, N):  # set dipoles randomly to 1 or -1
         if coldStart:
             position = 0
         else:
             position = random.random() * 2 - 1
 
         config[i] = position
+    config[N] = config[0]
     return config
 
 
@@ -118,84 +117,111 @@ def updateConfig(oldConfig, epsilon):
     return newConfig
 
 
-def termalizeConfig(config, iterations, epsilon):
+def thermalizeConfig(freshConfig, updates, epsilon):
+    thermalized = freshConfig
+    for k in range(0, updates):
+        thermalized = updateConfig(thermalized, epsilon)
+    return thermalized
+
+
+def getSamples(config, samples, updates, epsilon):
+    print(
+        "Sample calculation for ",
+        samples,
+        " samples and ",
+        updates,
+        " updates between samples:",
+    )
+    bar = progressBar()
+
     N = len(config) - 1
-    allConfigs = np.empty((N + 1, iterations + 1))
+    allConfigs = np.empty((N + 1, samples + 1))
     allConfigs[:, 0] = config
 
-    for i in range(1, iterations + 1):
-        allConfigs[:, i] = updateConfig(allConfigs[:, i - 1], epsilon)
+    for alpha in range(1, samples + 1):
+        oldConfig = allConfigs[:, alpha]
+        for k in range(0, updates):
+            oldConfig = updateConfig(oldConfig, epsilon)
+
+        allConfigs[:, alpha] = oldConfig
+        bar.updateBar(alpha + 1, samples + 1)
+    bar.finishBar()
+
+    allConfigs = allConfigs[:, 1 : samples + 1]
     return allConfigs
 
 
-def metropolisAlgorith(
-    N, steps, coldStart, epsilon
-):  # this algorithm calculates a valid ising chain of N elemets
+def greensFunction(config, n):
+    N = len(config) - 1
 
-    # declarations
-    oldConfig = np.empty(N + 1)  # Ising chain: with current config
-    newConfig = np.empty(N + 1)  # Ising chain: with trial config
-
-    oldConfig[0] = 0
-    oldConfig[N] = 0
-
-    # initial setup ising chain
-    for i in range(1, N):  # set dipoles randomly to 1 or -1
-        if coldStart:
-            position = 0
-        else:
-            position = random.random() * 20 - 10
-
-        oldConfig[i] = position
-
-    # generate trial configs and decide to accept or deny
-
-    for i in range(0, steps):
-
-        # set trial config to current config
-        newConfig = oldConfig
-
-        # 1b) pick one random dipole
-        changePosNo = random.randint(0, N)
-
-        # flip the dipole
-        newConfig[changePosNo] = changePos(newConfig[changePosNo], epsilon)
-
-        if deltaAction(oldConfig, newConfig) < 0:
-            oldConfig = newConfig
-        else:
-            # calculate probabiliy from the configs via Action
-            p = configProbability(oldConfig, newConfig)
-
-            # generate random number r between 0 and 1
-            r = random.random()
-            # decide if trial config is accepted
-            if p >= r:
-                # accept trial config
-                oldConfig = newConfig
-
-    return oldConfig
+    sum = 0
+    for j in range(0, N):
+        sum = sum + config[(j + n) % N] * config[j]
+    return sum / N
 
 
+def calculateG(configs):
+    Ncf = len(configs[0, :])
+    N = len(configs[:, 0])
+
+    G = np.empty((N, Ncf))
+
+    for alpha in range(0, Ncf):
+        for n in range(0, N):
+            G[n, alpha] = greensFunction(configs[:, alpha], n)
+
+    return G
+
+
+def calculateDeltaE(G):
+    Ncf = len(G[0, :])
+    N = len(G[:, 0]) - 1
+
+    deltaE = np.empty((N + 1, Ncf))
+
+    for n in range(0, N):
+        deltaE[n, :] = 2 * np.log(G[n, :] / G[n + 1, :])
+    return deltaE
+
+
+# parameters
 N = 100
 
-Ncf = 5000
+Ncf = 500
 Ncr = 50
 
 epsilon = 1.4
 
+# set config
 config = setConfig(N, coldStart=False)
 
-allConfigs = termalizeConfig(config, Ncf * Ncr, epsilon)
+# thermalize configs
+thermalizedConfig = thermalizeConfig(config, 5 * Ncr, epsilon)
 
-bar = progressBar()
 
-uncorrConfigs = np.empty((N + 1, Ncf))
-for l in range(0, Ncf):
-    # take every 50th configuration
-    uncorrConfigs[:, l] = allConfigs[:, (l + 1) * Ncr]
-    bar.updateBar((l + 1) / Ncf)
+# select uncorrelated configs
+uncorrConfigs = getSamples(thermalizedConfig, Ncf, Ncr, epsilon)
 
-bar.finishBar()
 plt.plot(uncorrConfigs)
+plt.show()
+
+# calculate greens function
+
+G = calculateG(uncorrConfigs)
+
+avgG = np.sum(G, axis=1)
+
+plt.plot(G)
+plt.show()
+
+plt.plot(avgG)
+plt.show()
+
+
+deltaE = calculateDeltaE(G)
+plt.plot(deltaE[0, :])
+plt.plot(deltaE[1, :])
+plt.plot(deltaE[2, :])
+plt.plot(deltaE[3, :])
+plt.plot(deltaE[4, :])
 plt.show()
