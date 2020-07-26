@@ -147,6 +147,11 @@ def alpha_numerical(a, b, N, U_a, U_b):
 
     # =======================================================================================
     # calcuöate the alpha vector
+    plt.plot(bDash)
+    plt.show()
+    plt.imshow(AMatrix)
+    plt.show()
+
     alpha = LA.inv(AMatrix).dot(bDash)
     return alpha
 
@@ -189,23 +194,24 @@ U_b = 1
 a = 0
 b = 1
 
+x = np.linspace(a, b, 101)
 
-meanSquareError = np.empty(101)
-# number of elements
-for N in range(3, 101):
-    numericalFullRange = np.empty(101)
-    analyticalFullRange = np.empty(101)
-    x = np.linspace(a, b, 101)
-    alpha = alpha_numerical(a, b, N, U_a, U_b)
-    for k in range(0, 101):
-        numericalFullRange[k] = U_numerical(x[k], a, b, N, U_a, U_b, alpha)
-        analyticalFullRange[k] = U_analytical(x[k])
-
-    # calculate accuracy of the numerical solution:
-    meanSquareError[N] = sum((numericalFullRange - analyticalFullRange) ** 2)
-    print(N)
+plt.plot(x)
+plt.show()
 
 
-plt.plot(meanSquareError)
+alpha = alpha_numerical(a, b, 101, U_a, U_b)
+
+plt.plot(alpha)
+plt.show()
+
+numericalFullRange = np.empty(101)
+analyticalFullRange = np.empty(101)
+for k in range(0, 101):
+    numericalFullRange[k] = U_numerical(x[k], a, b, 101, U_a, U_b, alpha)
+    analyticalFullRange[k] = U_analytical(x[k])
+
+plt.plot(numericalFullRange)
+plt.plot(analyticalFullRange)
 plt.show()
 

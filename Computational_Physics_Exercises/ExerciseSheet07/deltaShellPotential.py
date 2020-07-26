@@ -9,15 +9,15 @@ class gaussPoints:
     eps = 3e-14  # adjust accuracy
 
     job = ""
-    x = np.empty((10, 1))  # gausspo x
-    w = np.empty((10, 1))  # gausspo weight
+    points = np.empty((10, 1))  # gausspo x
+    weights = np.empty((10, 1))  # gausspo weight
 
     def __init__(self, npts, job, a, b):
 
         self.job = job
 
-        self.w = np.empty((npts, 1))
-        self.x = np.empty((npts, 1))
+        self.weights = np.empty((npts, 1))
+        self.points = np.empty((npts, 1))
 
         m = (npts + 1) / 2
 
@@ -36,25 +36,25 @@ class gaussPoints:
                 t1 = t
                 t = t1 - p1 / pp
 
-            self.x[i - 1] = -t
-            self.x[npts - i] = t
-            self.w[i - 1] = 2.0 / ((1.0 - t * t) * pp * pp)
-            self.w[npts - i] = self.w[i - 1]
+            self.points[i - 1] = -t
+            self.points[npts - i] = t
+            self.weights[i - 1] = 2.0 / ((1.0 - t * t) * pp * pp)
+            self.weights[npts - i] = self.weights[i - 1]
             # prf("x[i-1] = %f, w = %f ", x[i - 1], w[npts - i])
 
         # prf("\n")
 
         if job == 0:
             for i in range(0, npts):
-                self.x[i] = self.x[i] * (b - a) / 2 + (b + a) / 2
-                self.w[i] = self.w[i] * (b - a) / 2
+                self.points[i] = self.points[i] * (b - a) / 2 + (b + a) / 2
+                self.weights[i] = self.weights[i] * (b - a) / 2
 
         if job == 1:
             for i in range(0, npts):
-                xi = self.x[i]
-                self.x[i] = a * b * (1 + xi) / (b + a - (b - a) * xi)
-                self.w[i] = (
-                    self.w[i]
+                xi = self.points[i]
+                self.points[i] = a * b * (1 + xi) / (b + a - (b - a) * xi)
+                self.weights[i] = (
+                    self.weights[i]
                     * 2
                     * a
                     * b
@@ -64,19 +64,19 @@ class gaussPoints:
 
         if job == 2:
             for i in range(0, npts):
-                xi = self.x[i]
-                self.x[i] = (b * xi + b + a + a) / (1 - xi)
-                self.w[i] = self.w[i] * 2 * (a + b) / ((1 - xi) * (1 - xi))
+                xi = self.points[i]
+                self.points[i] = (b * xi + b + a + a) / (1 - xi)
+                self.weights[i] = self.weights[i] * 2 * (a + b) / ((1 - xi) * (1 - xi))
 
 
-def createHmatrix(N, k, w, mu, lambd, b):
-    H = np.empty((N, N))
+def createHmatrix(pointCount, k, w, mu, lambd, b):
+    hamiltonMatrix = np.empty((pointCount, pointCount))
 
     # create the matrix
-    for i in range(0, N):
-        for j in range(0, N):
+    for i in range(0, pointCount):
+        for j in range(0, pointCount):
             if i == j:
-                H[i, j] = (
+                hamiltonMatrix[i, j] = (
                     k[i] ** 2 / (2 * mu)
                     + lambd
                     / (np.pi * mu)
@@ -87,7 +87,7 @@ def createHmatrix(N, k, w, mu, lambd, b):
                     * w[j]
                 )
             else:
-                H[i, j] = (
+                hamiltonMatrix[i, j] = (
                     lambd
                     / (np.pi * mu)
                     * np.sin(k[i] * b)
@@ -96,7 +96,7 @@ def createHmatrix(N, k, w, mu, lambd, b):
                     * k[j]
                     * w[j]
                 )  #
-    return H
+    return hamiltonMatrix
 
 
 # constants dictated by the exercise sheet
@@ -114,8 +114,8 @@ for i in range(1, 4):
     N = 10 ** i
 
     gaussPointsIntegration = gaussPoints(N, 0, 0, k_max)
-    k = gaussPointsIntegration.x
-    w = gaussPointsIntegration.w
+    k = gaussPointsIntegration.points
+    w = gaussPointsIntegration.weights
 
     # create matrix:
     H = createHmatrix(N, k, w, mu, lambd, b)
